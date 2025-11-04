@@ -9,7 +9,11 @@ import { getBudget, setBudget, Budget as BudgetType } from '@/lib/mockApi';
 import { toast } from 'sonner';
 
 export default function Budget() {
-  const [budget, setBudgetState] = useState<BudgetType>({ month: '', amount: 0, spent: 0 });
+  const [budget, setBudgetState] = useState<BudgetType>({
+    month: '',
+    amount: 0,
+    spent: 0,
+  });
   const [newBudgetAmount, setNewBudgetAmount] = useState('');
 
   useEffect(() => {
@@ -17,14 +21,69 @@ export default function Budget() {
   }, []);
 
   const loadBudget = async () => {
+  try {
     const data = await getBudget();
-    setBudgetState(data);
-    setNewBudgetAmount(data.amount.toString());
-  };
+    console.log("🔹 Raw budget data from DB:", data);
+
+    // ✅ If your API returns an array
+    if (Array.isArray(data) && data.length > 0) {
+      const firstItem = data[0];
+      console.log("✅ Loaded budget item:", firstItem);
+
+      const budgetAmount = parseFloat(firstItem.amount?.toString() || "0");
+      const spentAmount = parseFloat(firstItem.spent?.toString() || "0");
+
+      setBudgetState({
+      month: new Date().toISOString().slice(0, 7),
+      amount: budgetAmount,
+      spent: spentAmount,
+      });
+
+
+      setNewBudgetAmount(budgetAmount.toString());
+    } 
+    // ✅ If your API returns a single object
+    else if (data && typeof data === "object") {
+      console.log("✅ Loaded single budget object:", data);
+
+      const budgetAmount = parseFloat(data.amount?.toString() || "0");
+      const spentAmount = parseFloat(data.spent?.toString() || "0");
+
+      setBudgetState({
+      month: new Date().toISOString().slice(0, 7),
+      amount: budgetAmount,
+      spent: spentAmount,
+      });
+
+
+      setNewBudgetAmount(budgetAmount.toString());
+    } 
+    // ⚠️ No data found
+    else {
+      console.warn("⚠️ No budget data found");
+      setBudgetState({
+      month: "",
+      amount: 0,
+      spent: 0,
+      });
+
+      setNewBudgetAmount("");
+    }
+  } catch (error) {
+    console.error("❌ Error loading budget:", error);
+    setBudgetState({
+    month: "",
+    amount: 0,
+    spent: 0,
+    });
+
+  }
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newBudgetAmount || parseFloat(newBudgetAmount) <= 0) {
       toast.error('Please enter a valid budget amount');
       return;
@@ -35,9 +94,9 @@ export default function Budget() {
       await setBudget({
         month: currentMonth,
         amount: parseFloat(newBudgetAmount),
-        spent: budget.spent
+        spent: budget.spent,
       });
-      
+
       toast.success('Budget updated successfully');
       loadBudget();
     } catch (error) {
@@ -45,7 +104,8 @@ export default function Budget() {
     }
   };
 
-  const percentageSpent = budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
+  const percentageSpent =
+    budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
   const remaining = budget.amount - budget.spent;
   const isOverBudget = remaining < 0;
 
@@ -63,7 +123,7 @@ export default function Budget() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">Monthly Budget</p>
                 <h3 className="text-3xl font-bold text-foreground">
-                  ${budget.amount.toLocaleString()}
+                  ${budget.amount ? budget.amount.toLocaleString() : 0}
                 </h3>
               </div>
               <div className="p-3 rounded-xl bg-secondary/10 text-secondary">
@@ -79,7 +139,7 @@ export default function Budget() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">Spent</p>
                 <h3 className="text-3xl font-bold text-destructive">
-                  ${budget.spent.toLocaleString()}
+                  ${budget.spent ? budget.spent.toLocaleString() : 0}
                 </h3>
               </div>
               <div className="p-3 rounded-xl bg-destructive/10 text-destructive">
@@ -94,11 +154,21 @@ export default function Budget() {
             <div className="flex items-start justify-between">
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground">Remaining</p>
-                <h3 className={`text-3xl font-bold ${isOverBudget ? 'text-destructive' : 'text-success'}`}>
-                  ${Math.abs(remaining).toLocaleString()}
+                <h3
+                  className={`text-3xl font-bold ${
+                    isOverBudget ? 'text-destructive' : 'text-success'
+                  }`}
+                >
+                  ${remaining ? Math.abs(remaining).toLocaleString() : 0}
                 </h3>
               </div>
-              <div className={`p-3 rounded-xl ${isOverBudget ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}>
+              <div
+                className={`p-3 rounded-xl ${
+                  isOverBudget
+                    ? 'bg-destructive/10 text-destructive'
+                    : 'bg-success/10 text-success'
+                }`}
+              >
                 <AlertCircle className="w-6 h-6" />
               </div>
             </div>
@@ -125,7 +195,10 @@ export default function Budget() {
                 <AlertCircle className="w-5 h-5 mt-0.5" />
                 <div>
                   <p className="font-medium">Over Budget!</p>
-                  <p className="text-sm">You've exceeded your budget by ${Math.abs(remaining).toLocaleString()}.</p>
+                  <p className="text-sm">
+                    You've exceeded your budget by $
+                    {remaining ? Math.abs(remaining).toLocaleString() : 0}.
+                  </p>
                 </div>
               </div>
             )}
@@ -135,7 +208,9 @@ export default function Budget() {
                 <AlertCircle className="w-5 h-5 mt-0.5" />
                 <div>
                   <p className="font-medium">Budget Warning</p>
-                  <p className="text-sm">You've used {percentageSpent.toFixed(1)}% of your budget.</p>
+                  <p className="text-sm">
+                    You've used {percentageSpent.toFixed(1)}% of your budget.
+                  </p>
                 </div>
               </div>
             )}
@@ -143,16 +218,24 @@ export default function Budget() {
             <div className="pt-4 border-t space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Budget:</span>
-                <span className="font-medium">${budget.amount.toLocaleString()}</span>
+                <span className="font-medium">
+                  ${budget.amount ? budget.amount.toLocaleString() : 0}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Spent:</span>
-                <span className="font-medium text-destructive">${budget.spent.toLocaleString()}</span>
+                <span className="font-medium text-destructive">
+                  ${budget.spent ? budget.spent.toLocaleString() : 0}
+                </span>
               </div>
               <div className="flex justify-between pt-2 border-t">
                 <span className="font-medium">Remaining:</span>
-                <span className={`font-bold ${isOverBudget ? 'text-destructive' : 'text-success'}`}>
-                  ${Math.abs(remaining).toLocaleString()}
+                <span
+                  className={`font-bold ${
+                    isOverBudget ? 'text-destructive' : 'text-success'
+                  }`}
+                >
+                  ${remaining ? Math.abs(remaining).toLocaleString() : 0}
                 </span>
               </div>
             </div>
@@ -161,7 +244,7 @@ export default function Budget() {
 
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle>Set Monthly Budget</CardTitle>
+            <CardTitle>{budget.amount > 0 ? 'Update Budget' : 'Add Budget'}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -181,13 +264,16 @@ export default function Budget() {
               <div className="space-y-2">
                 <Label>Current Month</Label>
                 <Input
-                  value={new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  value={new Date().toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric',
+                  })}
                   disabled
                 />
               </div>
 
               <Button type="submit" className="w-full">
-                Update Budget
+                {budget.amount > 0 ? 'Update Budget' : 'Add Budget'}
               </Button>
 
               <p className="text-sm text-muted-foreground text-center">

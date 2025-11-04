@@ -1,5 +1,4 @@
-// Mock API functions that simulate AWS Lambda endpoints
-// Replace these with actual AWS API Gateway URLs when ready
+// api.ts
 
 export interface Transaction {
   id: string;
@@ -22,103 +21,61 @@ export interface Summary {
   balance: number;
 }
 
-// Mock data store (in production, this would be in a database)
-let transactions: Transaction[] = [
-  {
-    id: '1',
-    amount: 5000,
-    category: 'Salary',
-    date: '2025-10-01',
-    note: 'Monthly salary',
-    type: 'income'
-  },
-  {
-    id: '2',
-    amount: 1200,
-    category: 'Rent',
-    date: '2025-10-05',
-    note: 'Monthly rent payment',
-    type: 'expense'
-  },
-  {
-    id: '3',
-    amount: 350,
-    category: 'Groceries',
-    date: '2025-10-08',
-    note: 'Weekly shopping',
-    type: 'expense'
-  },
-  {
-    id: '4',
-    amount: 80,
-    category: 'Utilities',
-    date: '2025-10-10',
-    note: 'Electricity bill',
-    type: 'expense'
-  },
-  {
-    id: '5',
-    amount: 200,
-    category: 'Entertainment',
-    date: '2025-10-15',
-    note: 'Concert tickets',
-    type: 'expense'
-  },
-];
+// ✅ Base URL of your Flask backend on EC2
+const BASE_URL = "http://98.93.73.246:5000";
 
-let budget: Budget = {
-  month: '2025-10',
-  amount: 4000,
-  spent: 1830
-};
+// ---------------------- TRANSACTIONS ----------------------
 
 // POST /transactions - Add new transaction
 export const addTransaction = async (transaction: Omit<Transaction, 'id'>): Promise<Transaction> => {
-  const newTransaction = {
-    ...transaction,
-    id: Date.now().toString()
-  };
-  transactions.push(newTransaction);
-  return new Promise(resolve => setTimeout(() => resolve(newTransaction), 300));
+  const response = await fetch(`${BASE_URL}/transactions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(transaction)
+  });
+  if (!response.ok) throw new Error('Failed to add transaction');
+  return response.json();
 };
 
 // GET /transactions - Get all transactions
 export const getTransactions = async (): Promise<Transaction[]> => {
-  return new Promise(resolve => setTimeout(() => resolve([...transactions]), 300));
+  const response = await fetch(`${BASE_URL}/transactions`);
+  if (!response.ok) throw new Error('Failed to fetch transactions');
+  return response.json();
 };
 
 // GET /transactions/date - Get transactions by date
 export const getTransactionsByDate = async (startDate: string, endDate: string): Promise<Transaction[]> => {
-  const filtered = transactions.filter(t => t.date >= startDate && t.date <= endDate);
-  return new Promise(resolve => setTimeout(() => resolve(filtered), 300));
+  const response = await fetch(`${BASE_URL}/transactions/date?start=${startDate}&end=${endDate}`);
+  if (!response.ok) throw new Error('Failed to fetch transactions by date');
+  return response.json();
 };
+
+// ---------------------- BUDGET ----------------------
 
 // POST /budget - Set budget
 export const setBudget = async (newBudget: Budget): Promise<Budget> => {
-  budget = newBudget;
-  return new Promise(resolve => setTimeout(() => resolve(budget), 300));
+  const response = await fetch(`${BASE_URL}/budget`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newBudget)
+  });
+  if (!response.ok) throw new Error('Failed to set budget');
+  return response.json();
 };
 
 // GET /budget - Get budget
 export const getBudget = async (): Promise<Budget> => {
-  return new Promise(resolve => setTimeout(() => resolve(budget), 300));
+  const response = await fetch(`${BASE_URL}/budget`);
+  if (!response.ok) throw new Error('Failed to fetch budget');
+  return response.json();
 };
+
+// ---------------------- SUMMARY ----------------------
 
 // GET /summary - Get financial summary
 export const getSummary = async (): Promise<Summary> => {
-  const totalIncome = transactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const totalExpenses = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const balance = totalIncome - totalExpenses;
-  
-  return new Promise(resolve => setTimeout(() => resolve({
-    totalIncome,
-    totalExpenses,
-    balance
-  }), 300));
+  const response = await fetch(`${BASE_URL}/summary`);
+  if (!response.ok) throw new Error('Failed to fetch summary');
+  return response.json();
 };
