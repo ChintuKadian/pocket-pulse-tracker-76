@@ -21,6 +21,16 @@ export interface Summary {
   balance: number;
 }
 
+export interface Receipt {
+  id: string;
+  userId: string;
+  fileName: string;
+  fileUrl: string;
+  uploadDate: string;
+  amount?: number;
+  category?: string;
+}
+
 // ✅ Base URL of your Flask backend on EC2
 const BASE_URL = "http://100.27.190.37:5000";
 
@@ -82,5 +92,30 @@ export async function getBudget(userId = "default-user") {
 export const getSummary = async (): Promise<Summary> => {
   const response = await fetch(`${BASE_URL}/summary`);
   if (!response.ok) throw new Error('Failed to fetch summary');
+  return response.json();
+};
+
+// ---------------------- RECEIPTS ----------------------
+
+// POST /upload - Upload receipt
+export const uploadReceipt = async (file: File, userId: string, amount?: number, category?: string): Promise<Receipt> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('userId', userId);
+  if (amount) formData.append('amount', amount.toString());
+  if (category) formData.append('category', category);
+
+  const response = await fetch(`${BASE_URL}/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) throw new Error('Failed to upload receipt');
+  return response.json();
+};
+
+// GET /receipts - Get all receipts for a user
+export const getReceipts = async (userId: string): Promise<Receipt[]> => {
+  const response = await fetch(`${BASE_URL}/receipts?userId=${userId}`);
+  if (!response.ok) throw new Error('Failed to fetch receipts');
   return response.json();
 };
