@@ -76,8 +76,23 @@ export default function Settings() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>Export Data</Label>
-              <Button variant="outline" size="sm">Download</Button>
-            </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("http://100.27.190.37:5000/export-data");
+                        const data = await res.json();
+                        alert(data.message || "Export complete!");
+                      } catch (err) {
+                        alert("❌ Failed to export data");
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    Export
+                  </Button>
+              </div>
             <div className="flex items-center justify-between">
               <Label>Backup Settings</Label>
               <Button variant="outline" size="sm">Configure</Button>
@@ -126,7 +141,7 @@ export default function Settings() {
           </div>
           <Button>Save Configuration</Button>
           <p className="text-sm text-muted-foreground">
-            Configure your AWS Lambda endpoints for production use. Currently using mock data.
+            Configure your AWS Lambda endpoints for production use.
           </p>
         </CardContent>
       </Card>

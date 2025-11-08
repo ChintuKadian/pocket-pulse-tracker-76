@@ -22,7 +22,7 @@ export interface Summary {
 }
 
 // ✅ Base URL of your Flask backend on EC2
-const BASE_URL = "http://98.93.73.246:5000";
+const BASE_URL = "http://100.27.190.37:5000";
 
 // ---------------------- TRANSACTIONS ----------------------
 
@@ -58,18 +58,23 @@ export const setBudget = async (newBudget: Budget): Promise<Budget> => {
   const response = await fetch(`${BASE_URL}/budget`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(newBudget)
+    body: JSON.stringify({ amount: newBudget.amount }) // ✅ backend expects "amount"
   });
   if (!response.ok) throw new Error('Failed to set budget');
   return response.json();
 };
 
+
 // GET /budget - Get budget
-export const getBudget = async (): Promise<Budget> => {
-  const response = await fetch(`${BASE_URL}/budget`);
-  if (!response.ok) throw new Error('Failed to fetch budget');
-  return response.json();
-};
+export async function getBudget(userId = "default-user") {
+  const month = new Date().toISOString().slice(0, 7); // e.g. 2025-11
+  const res = await fetch(
+    `http://100.27.190.37:5000/budget?userId=${userId}&month=${month}`
+  );
+  if (!res.ok) throw new Error("Failed to fetch budget");
+  return await res.json();
+}
+
 
 // ---------------------- SUMMARY ----------------------
 

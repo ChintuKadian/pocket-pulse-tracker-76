@@ -17,68 +17,31 @@ export default function Budget() {
   const [newBudgetAmount, setNewBudgetAmount] = useState('');
 
   useEffect(() => {
-    loadBudget();
-  }, []);
+  loadBudget();
+}, []);
 
-  const loadBudget = async () => {
+const loadBudget = async () => {
   try {
-    const data = await getBudget();
-    console.log("🔹 Raw budget data from DB:", data);
+    const data = await getBudget("test-user"); 
+    console.log("🔹 Raw budget data from backend:", data);
 
-    // ✅ If your API returns an array
-    if (Array.isArray(data) && data.length > 0) {
-      const firstItem = data[0];
-      console.log("✅ Loaded budget item:", firstItem);
+    // ✅ Match backend fields exactly
+    const budgetAmount = parseFloat(data.budget?.toString() || "0");
+    const spentAmount = parseFloat(data.spent?.toString() || "0");
 
-      const budgetAmount = parseFloat(firstItem.amount?.toString() || "0");
-      const spentAmount = parseFloat(firstItem.spent?.toString() || "0");
-
-      setBudgetState({
-      month: new Date().toISOString().slice(0, 7),
-      amount: budgetAmount,
-      spent: spentAmount,
-      });
-
-
-      setNewBudgetAmount(budgetAmount.toString());
-    } 
-    // ✅ If your API returns a single object
-    else if (data && typeof data === "object") {
-      console.log("✅ Loaded single budget object:", data);
-
-      const budgetAmount = parseFloat(data.amount?.toString() || "0");
-      const spentAmount = parseFloat(data.spent?.toString() || "0");
-
-      setBudgetState({
-      month: new Date().toISOString().slice(0, 7),
-      amount: budgetAmount,
-      spent: spentAmount,
-      });
-
-
-      setNewBudgetAmount(budgetAmount.toString());
-    } 
-    // ⚠️ No data found
-    else {
-      console.warn("⚠️ No budget data found");
-      setBudgetState({
-      month: "",
-      amount: 0,
-      spent: 0,
-      });
-
-      setNewBudgetAmount("");
-    }
-  } catch (error) {
-    console.error("❌ Error loading budget:", error);
     setBudgetState({
-    month: "",
-    amount: 0,
-    spent: 0,
+      month: data.month || new Date().toISOString().slice(0, 7),
+      amount: budgetAmount,
+      spent: spentAmount,
     });
 
+    setNewBudgetAmount(budgetAmount.toString());
+  } catch (error) {
+    console.error("❌ Error loading budget:", error);
+    setBudgetState({ month: "", amount: 0, spent: 0 });
   }
 };
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
