@@ -11,6 +11,10 @@
     "skipLibCheck": true,
     "allowJs": true,
     "noUnusedLocals": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+
+    // ✅ Add these two lines
+    "forceConsistentCasingInFileNames": true,
+    "strict": false
   }
 }

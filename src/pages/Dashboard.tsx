@@ -4,7 +4,7 @@ import { SummaryCard } from '@/components/SummaryCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { getSummary, getTransactions, Transaction } from '@/lib/mockApi';
-import ReceiptUploader from "./ReceiptUploader";
+import UploadReceiptModal from '../components/UploadReceiptModal';
 
 const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
@@ -38,8 +38,8 @@ export default function Dashboard() {
 
   // Process data for monthly bar chart
   const monthlyData = [
-    { month: 'Sep', income: 4800, expenses: 3200 },
-    { month: 'Oct', income: summary.totalIncome, expenses: summary.totalExpenses },
+    { month: 'Oct', income: 4800, expenses: 3200 },
+    { month: 'Nov', income: summary.totalIncome, expenses: summary.totalExpenses },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function Dashboard() {
       <div>
         <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
         <p className="text-muted-foreground">Welcome back! Here's your financial overview.</p>
-        <ReceiptUploader />
+        <UploadReceiptModal />
       </div>
 
       {/* Summary Cards */}
