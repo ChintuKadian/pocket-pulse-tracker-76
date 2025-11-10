@@ -32,7 +32,7 @@ export interface Receipt {
 }
 
 // ✅ Base URL of your Flask backend on EC2
-const BASE_URL = "https://definition-morris-delivering-magic.trycloudflare.com";
+const BASE_URL = "http://100.27.190.37:5000";
 
 // ---------------------- TRANSACTIONS ----------------------
 
