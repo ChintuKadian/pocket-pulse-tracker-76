@@ -25,19 +25,19 @@ export default function Settings() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>Email Notifications</Label>
-              <Button variant="outline" size="sm">Configure</Button>
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>Budget Alerts</Label>
-              <Button variant="outline" size="sm">Configure</Button>
-            </div>
-          </CardContent>
+          <div className="flex items-center justify-between">
+            <Label>Email Notifications</Label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open("https://mail.google.com/", "_blank")}
+            >
+              Configure
+            </Button>
+          </div>
         </Card>
 
-        <Card className="shadow-md">
+        {/* <Card className="shadow-md">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-secondary/10 text-secondary">
@@ -59,7 +59,7 @@ export default function Settings() {
               <Button variant="outline" size="sm">Enable</Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card className="shadow-md">
           <CardHeader>
@@ -95,7 +95,13 @@ export default function Settings() {
               </div>
             <div className="flex items-center justify-between">
               <Label>Backup Settings</Label>
-              <Button variant="outline" size="sm">Configure</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open("https://s3.console.aws.amazon.com/s3/home", "_blank")}
+              >
+                Configure
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -117,15 +123,15 @@ export default function Settings() {
               <Label>Theme</Label>
               <Button variant="outline" size="sm">Light</Button>
             </div>
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <Label>Currency</Label>
               <Button variant="outline" size="sm">USD</Button>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-md">
+      {/* <Card className="shadow-md">
         <CardHeader>
           <CardTitle>AWS Lambda Configuration</CardTitle>
           <CardDescription>Configure your AWS API endpoints</CardDescription>
@@ -144,7 +150,7 @@ export default function Settings() {
             Configure your AWS Lambda endpoints for production use.
           </p>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

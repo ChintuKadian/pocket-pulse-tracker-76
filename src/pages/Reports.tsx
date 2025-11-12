@@ -34,7 +34,6 @@ export default function Reports() {
   // Income vs Expenses comparison
   const comparisonData = [
     {
-      name: 'October 2025',
       income: transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
       expenses: transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
     }
